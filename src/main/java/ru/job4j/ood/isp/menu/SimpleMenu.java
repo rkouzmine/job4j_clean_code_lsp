@@ -8,14 +8,26 @@ public class SimpleMenu implements Menu {
 
     @Override
     public boolean add(String parentName, String childName, ActionDelegate actionDelegate) {
-        /*  добавьте реализацию*/
-        return false;
+        boolean result = false;
+        Optional<ItemInfo> itemInfo = findItem(parentName);
+        if (parentName == null) {
+            rootElements.add(new SimpleMenuItem(childName, actionDelegate));
+            result = true;
+        } else if (itemInfo.isPresent()) {
+            itemInfo.get().menuItem.getChildren().add(new SimpleMenuItem(childName, actionDelegate));
+            result = true;
+        }
+        return result;
     }
 
     @Override
     public Optional<MenuItemInfo> select(String itemName) {
-        /*  добавьте реализацию*/
-        return null;
+        Optional<MenuItemInfo> result = Optional.empty();
+        Optional<ItemInfo> itemInfo = findItem(itemName);
+        if (itemInfo.isPresent()) {
+           result = Optional.of(new MenuItemInfo(itemInfo.get().menuItem, itemInfo.get().number));
+        }
+        return result;
     }
 
     @Override
@@ -25,8 +37,16 @@ public class SimpleMenu implements Menu {
     }
 
     private Optional<ItemInfo> findItem(String name) {
-        /*  добавьте реализацию*/
-        return null;
+        Optional<ItemInfo> result = Optional.empty();
+        DFSIterator dfsIterator = new DFSIterator();
+        while (dfsIterator.hasNext()) {
+            ItemInfo itemInfo = dfsIterator.next();
+            if (itemInfo.menuItem.getName().equals(name)) {
+                result = Optional.of(itemInfo);
+                break;
+            }
+        }
+        return result;
     }
 
     private static class SimpleMenuItem implements MenuItem {
