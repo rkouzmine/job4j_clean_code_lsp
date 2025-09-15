@@ -25,15 +25,26 @@ public class SimpleMenu implements Menu {
         Optional<MenuItemInfo> result = Optional.empty();
         Optional<ItemInfo> itemInfo = findItem(itemName);
         if (itemInfo.isPresent()) {
-           result = Optional.of(new MenuItemInfo(itemInfo.get().menuItem, itemInfo.get().number));
+            result = Optional.of(new MenuItemInfo(itemInfo.get().menuItem, itemInfo.get().number));
         }
         return result;
     }
 
     @Override
     public Iterator<MenuItemInfo> iterator() {
-        /*  добавьте реализацию*/
-        return null;
+        DFSIterator dfsIterator = new DFSIterator();
+        return new Iterator<>() {
+            @Override
+            public boolean hasNext() {
+                return dfsIterator.hasNext();
+            }
+
+            @Override
+            public MenuItemInfo next() {
+                ItemInfo itemInfo = dfsIterator.next();
+                return new MenuItemInfo(itemInfo.menuItem, itemInfo.number);
+            }
+        };
     }
 
     private Optional<ItemInfo> findItem(String name) {
@@ -104,7 +115,7 @@ public class SimpleMenu implements Menu {
             String lastNumber = numbers.removeFirst();
             List<MenuItem> children = current.getChildren();
             int currentNumber = children.size();
-            for (var i = children.listIterator(children.size()); i.hasPrevious();) {
+            for (var i = children.listIterator(children.size()); i.hasPrevious(); ) {
                 stack.addFirst(i.previous());
                 numbers.addFirst(lastNumber.concat(String.valueOf(currentNumber--)).concat("."));
             }
