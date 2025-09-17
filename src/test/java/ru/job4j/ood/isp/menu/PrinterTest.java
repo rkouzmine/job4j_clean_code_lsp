@@ -13,9 +13,12 @@ class PrinterTest {
     public void whenPrinterPrintsMenuThenOutputIsCorrect() {
         menu.add(Menu.ROOT, "Сходить в магазин", STUB_ACTION);
         menu.add(Menu.ROOT, "Покормить собаку", STUB_ACTION);
+        menu.add(Menu.ROOT, "Учеба", STUB_ACTION);
         menu.add("Сходить в магазин", "Купить продукты", STUB_ACTION);
         menu.add("Купить продукты", "Купить хлеб", STUB_ACTION);
         menu.add("Купить продукты", "Купить молоко", STUB_ACTION);
+        menu.add("Учеба", "Выполнить задания на Job4j", STUB_ACTION);
+        menu.add("Выполнить задания на Job4j", "Создать меню", STUB_ACTION);
         String result = printer.print(menu);
         String expected = """
                 1. Сходить в магазин
@@ -23,6 +26,9 @@ class PrinterTest {
                 --------1.1.1. Купить хлеб
                 --------1.1.2. Купить молоко
                 2. Покормить собаку
+                3. Учеба
+                ----3.1. Выполнить задания на Job4j
+                --------3.1.1. Создать меню
                 """;
         assertThat(result).isEqualTo(expected);
     }

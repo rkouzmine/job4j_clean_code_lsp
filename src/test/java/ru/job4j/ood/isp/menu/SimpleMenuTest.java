@@ -30,4 +30,25 @@ public class SimpleMenuTest {
                 .isEqualTo(menu.select("Покормить собаку").get());
         menu.forEach(i -> System.out.println(i.getNumber() + i.getName()));
     }
+
+    @Test
+    public void whenSelectThenReturnExpectedResult() {
+        Menu menu = new SimpleMenu();
+        menu.add(Menu.ROOT, "Учеба", STUB_ACTION);
+        menu.add("Учеба", "Выполнить задания на Job4j", STUB_ACTION);
+        menu.add("Выполнить задания на Job4j", "Создать меню", STUB_ACTION);
+        assertThat(new Menu.MenuItemInfo(
+                "Учеба",
+                List.of("Выполнить задания на Job4j"), STUB_ACTION, "1."))
+                .isEqualTo(menu.select("Учеба").get());
+        assertThat(new Menu.MenuItemInfo(
+                "Выполнить задания на Job4j",
+                List.of("Создать меню"), STUB_ACTION, "1.1."))
+                .isEqualTo(menu.select("Выполнить задания на Job4j").get());
+        assertThat(new Menu.MenuItemInfo(
+                "Создать меню",
+                List.of(), STUB_ACTION, "1.1.1."))
+                .isEqualTo(menu.select("Создать меню").get());
+        menu.forEach(i -> System.out.println(i.getNumber() + i.getName()));
+    }
 }
