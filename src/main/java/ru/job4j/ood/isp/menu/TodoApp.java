@@ -1,37 +1,48 @@
 package ru.job4j.ood.isp.menu;
 
+import org.jetbrains.annotations.NotNull;
+import ru.job4j.ood.isp.menu.Menu.MenuItemInfo;
+
+import java.util.Optional;
 import java.util.Scanner;
 
-/**
- * 6. Создайте простенький класс TodoApp. Этот класс будет представлять собой консольное приложение, которое позволяет:
- * Добавить элемент в корень меню;
- * Добавить элемент к родительскому элементу;
- * Вызвать действие, привязанное к пункту меню (действие можно сделать константой,
- * например, ActionDelete DEFAULT_ACTION = () -> System.out.println("Some action") и указывать при добавлении элемента в меню);
- * Вывести меню в консоль.
- */
 public class TodoApp {
-    private final Menu menu = new SimpleMenu();
+    private final static  ActionDelegate DEFAULT_ACTION = () -> System.out.println("Some action");
+    private final SimpleMenu menu = new SimpleMenu();
     private final Printer printer = new Printer();
 
-    private final static ActionDelegate DEFAULT_ACTION = () -> System.out.println("Some action");
-
-    private void addItemRoot(Scanner scanner) {
+    private void addItemRoot(@NotNull Scanner scanner) {
+        System.out.println("Введите имя элемента");
         String item = scanner.nextLine();
         menu.add(Menu.ROOT, item, DEFAULT_ACTION);
-        System.out.println("Элемент добавлен в root");
+        System.out.println("Элемент добавлен в корень меню");
     }
 
-    private void addChildItem(Scanner scanner) {
+    private void addChildItem(@NotNull Scanner scanner) {
+        System.out.println("Введите имя родительского элемента");
         String parentItem = scanner.nextLine();
-        String childItem = scanner.nextLine();
-        menu.add(parentItem, childItem, DEFAULT_ACTION);
-        System.out.println("Элемент добавлен к родительскому элементу");
+
+        Optional<MenuItemInfo> selected = menu.select(parentItem);
+
+        if (selected.isPresent()) {
+            System.out.println("Введите имя дочернего элемента");
+            String childItem = scanner.nextLine();
+            menu.add(parentItem, childItem, DEFAULT_ACTION);
+            System.out.printf("Элемент '%s' добавлен к элементу '%s'%n", childItem, parentItem);
+        } else {
+            System.out.printf("Элемент '%s' не найден%n", parentItem);
+        }
     }
 
-    private void getDelegateItem(Scanner scanner) {
+    private void getDelegateItem(@NotNull Scanner scanner) {
+        System.out.println("Введите имя элемента, чтобы вызвать его действие");
         String item = scanner.nextLine();
-        System.out.println(menu.select(item));
+        Optional<MenuItemInfo> selected = menu.select(item);
+        if (selected.isPresent()) {
+            selected.get().getActionDelegate().delegate();
+        } else {
+            System.out.printf("Элемент '%s' не найден%n", item);
+        }
     }
 
     private void printMenu() {
@@ -40,8 +51,8 @@ public class TodoApp {
 
     public static void main(String[] args) {
         TodoApp app = new TodoApp();
-        Scanner sc = new Scanner(System.in);
-        int choice;
+        Scanner scanner = new Scanner(System.in);
+
         boolean result = true;
         System.out.println("""
                 TodoApp - это консольное приложение которое позволяет:
@@ -49,6 +60,30 @@ public class TodoApp {
                     2. Добавлять элемент к родительскому элементу
                     3. Вызывать действие, привязанное к пункту меню
                     4. Выводить меню в консоль
+                    
+                Чтобы закрыть приложение нажмите 0
                 """);
+
+        while (result) {
+            String str = "Введите число от 0 до 4";
+            String input = scanner.nextLine();
+            int choice;
+            try {
+                choice = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println(str);
+                continue;
+            }
+            switch (choice) {
+                case 1 -> app.addItemRoot(scanner);
+                case 2 -> app.addChildItem(scanner);
+                case 3 -> app.getDelegateItem(scanner);
+                case 4 -> app.printMenu();
+                case 0 -> {
+                    result = false;
+                }
+                default -> System.out.println(str);
+            }
+        }
     }
 }

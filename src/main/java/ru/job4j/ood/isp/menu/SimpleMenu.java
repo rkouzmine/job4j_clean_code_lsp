@@ -133,4 +133,5 @@ public class SimpleMenu implements Menu {
             this.number = number;
         }
     }
+
 }
